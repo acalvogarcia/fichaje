@@ -11,8 +11,6 @@ from sentry_sdk.integrations.celery import CeleryIntegration
 from .base import *  # noqa
 from .base import env
 
-DEBUG = True
-
 # GENERAL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
