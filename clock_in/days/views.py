@@ -8,6 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 
 from .models import WorkDay, Month, Year
+from .forms import WorkDayForm
 
 # Create your views here.
 
@@ -15,12 +16,7 @@ from .models import WorkDay, Month, Year
 class DayDetailView(LoginRequiredMixin, UpdateView):
 
     model = WorkDay
-    fields = [
-            "start_time",
-            "end_time",
-            "lunch_start_time",
-            "lunch_end_time",
-        ]
+    form_class = WorkDayForm
     template_name = "days/day_detail.html"
 
     def get_object(self, **kwargs) -> WorkDay:
@@ -78,12 +74,20 @@ class MonthDetailView(LoginRequiredMixin, ListView):
     model = Month
     template_name = "days/month_detail.html"
 
-    def get_object(self):
+    def get_object(self) -> Month:
         month = self.kwargs["month"]
         year = self.kwargs["year"]
         user = self.request.user
 
-        return Month.objects.get(year__user=user, month=month, year__year=year)
+        try:
+            return Month.objects.get(month=month, year__year=year)
+        except Month.DoesNotExist:
+            try:
+                year_object = Year.objects.get(user=user, year=year)
+            except Year.DoesNotExist:
+                year_object = Year.objects.create(user=user, year=year)
+
+            return Month(month=month, year=year_object)
 
     def get_queryset(self) -> QuerySet:
         month_object = self.get_object()
@@ -99,38 +103,28 @@ class MonthDetailView(LoginRequiredMixin, ListView):
 
         days_in_month = [str(num) for num in range(1, monthrange(year, month)[1] + 1)]
 
-        day_working_time = user.day_working_time
-        day_working_time_delta = datetime.timedelta(
-            hours=day_working_time.hour,
-            minutes=day_working_time.minute,
-            seconds=day_working_time.second)
-
         days_worked = {}
         for day in days_in_month:
+            days_worked[day] = {}
             try:
                 day_object = queryset.get(day=int(day))
-                days_worked[day] = {}
                 days_worked[day]["day_object"] = day_object
+                days_worked[day]["day_link"] = day_object.get_absolute_url
                 days_worked[day]["time_worked"] = day_object.time_worked
-                days_worked[day]["day_working_time"] = day_working_time_delta
-                days_worked[day]["time_balance"] = day_object.time_worked - day_working_time_delta
+                days_worked[day]["day_working_time"] = day_object.working_time_delta
+                days_worked[day]["time_balance"] = abs(day_object.time_balance)
+                days_worked[day]["time_balance_positive"] = day_object.time_balance_positive
             except WorkDay.DoesNotExist:
-                days_worked[day] = {}
+                days_worked[day]["day_link"] = WorkDay.get_day_url(day=day, month=month, year=year)
                 days_worked[day]["time_worked"] = "--"
                 days_worked[day]["day_working_time"] = "--"
                 days_worked[day]["time_balance"] = "--"
+                days_worked[day]["time_balance_positive"] = True
 
+        month_object = self.get_object()
 
-        # days_worked = {}
-        # for day in self.get_queryset():
-        #     days_worked[str(day.day)] = {}
-        #     days_worked[str(day.day)]["time_worked"] = day.time_worked
-        #     day_working_time = user.day_working_time
-        #     day_working_time_delta = datetime.timedelta(
-        #         hours=day_working_time.hour,
-        #         minutes=day_working_time.minute,
-        #         seconds=day_working_time.second)
-        #     days_worked[str(day.day)]["time_balance"] = day.time_worked - day_working_time_delta
+        context["year_link"] = month_object.year.get_absolute_url()
+        context["month_link"] = month_object.get_absolute_url()
 
         total_time_worked = datetime.timedelta()
         for time_worked in [day.time_worked for day in self.get_queryset()]:
@@ -148,8 +142,54 @@ class YearDetailView(LoginRequiredMixin, ListView):
     model = Year
     template_name = "days/year_detail.html"
 
+    def get_object(self) -> Year:
+        year = self.kwargs["year"]
+        user = self.request.user
+
+        return Year.objects.get(user=user, year=year)
+
     def get_queryset(self) -> QuerySet:
         year = self.kwargs["year"]
         user = self.request.user
 
-        return Year.objects.filter(user=user, year=year)
+        year_object = Year.objects.get(user=user, year=year)
+        return year_object.months.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        queryset = self.get_queryset()
+
+        year = self.kwargs["year"]
+        user = self.request.user
+
+        months_in_year = [str(num) for num in range(1,13)]
+
+        months_worked = {}
+        for month in months_in_year:
+            months_worked[month] = {}
+            try:
+                month_object = queryset.get(month=int(month))
+                months_worked[month]["month_object"] = month_object
+                months_worked[month]["month_link"] = month_object.get_absolute_url
+                months_worked[month]["time_worked"] = month_object.time_worked
+                months_worked[month]["month_working_time"] = month_object.working_time_delta
+                months_worked[month]["time_balance"] = abs(month_object.time_balance)
+                months_worked[month]["time_balance_positive"] = month_object.time_balance_positive
+            except Month.DoesNotExist:
+                months_worked[month] = {}
+                months_worked[month]["month_link"] = Month.get_month_url(month=month, year=year)
+                months_worked[month]["time_worked"] = "--"
+                months_worked[month]["month_working_time"] = "--"
+                months_worked[month]["time_balance"] = "--"
+                months_worked[month]["time_balance_positive"] = True
+        
+        year_object = self.get_object()
+
+        total_time_worked = datetime.timedelta()
+        for time_worked in [month.time_worked for month in self.get_queryset()]:
+            total_time_worked += time_worked
+
+        context["months_worked"] = months_worked
+        context["year_link"] = year_object.get_absolute_url()
+
+        return context
