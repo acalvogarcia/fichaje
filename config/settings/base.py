@@ -303,3 +303,7 @@ REST_FRAMEWORK = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+# Django Tempus Dominus
+TEMPUS_DOMINUS_LOCALIZE = False
+TEMPUS_DOMINUS_INCLUDE_ASSETS = True
