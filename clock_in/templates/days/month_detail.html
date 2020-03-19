@@ -12,8 +12,14 @@
 
     <div class="row">
 
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{{year_link}}">Año</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Día</li>
+            </ol>
+          </nav>
         <div class="col-sm-12">
-            <a href="{{object.year.get_absolute_url}}" class="btn btn-default">Año</a>
+            <a href="{{year_link}}" class="btn btn-default">Año</a>
         </div>
 
         <div class="col-sm-12">
@@ -32,14 +38,14 @@
                     {% for day, dict in days_worked.items %}
 
                     <tr>
-                        {% if "day_object" in dict %}
-                        <th scope="row"><a href="{{dict.day_object.get_absolute_url}}"></a>{{day}}</th>
-                        {% else %}
-                        <th scope="row">{{day}}</th>
-                        {% endif %}
+                        <th scope="row"><a href="{{dict.day_link}}">{{day}}</a></th>
                         <td>{{dict.time_worked}}</td>
-                        <td>{{user.day_working_time|time:"H:i"}}</td>
-                        <td>{{dict.time_balance}}</td>
+                        <td>{{dict.day_working_time}}</td>
+                        {% if dict.time_balance_positive %}
+                        <td style="color:green">{{dict.time_balance}}</td>
+                        {% else %}
+                        <td style="color:red">-{{dict.time_balance}}</td>
+                        {% endif %}
                     </tr>
 
                     {% endfor %}
