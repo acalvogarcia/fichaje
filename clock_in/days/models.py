@@ -82,6 +82,8 @@ class WorkDay(models.Model):
     lunch_start_time = models.TimeField(blank=True, null=True)
     lunch_end_time = models.TimeField(blank=True, null=True)
 
+    digest = models.TextField(blank=True, null=True)
+
     unique_together = ['day', 'month']
 
     @property

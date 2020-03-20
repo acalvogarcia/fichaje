@@ -16,6 +16,9 @@ class User(AbstractUser):
     day_working_time = models.TimeField(default=datetime.time())
     time_flexibility = models.BooleanField(default=False)
 
+    job_position = models.CharField(max_length=255, blank=True, null=True)
+    job_tasks = models.TextField(blank=True, null=True)
+
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})
 

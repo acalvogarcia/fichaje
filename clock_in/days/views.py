@@ -1,11 +1,13 @@
 import datetime
+import pdfkit
 from calendar import monthrange
 
 from django.db.models import QuerySet
 from django.shortcuts import render
 from django.views.generic import DetailView, RedirectView, UpdateView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, FileResponse, HttpResponse
+from django.template.loader import render_to_string
 
 from .models import WorkDay, Month, Year
 from .forms import WorkDayForm
@@ -65,6 +67,24 @@ class DayDetailView(LoginRequiredMixin, UpdateView):
             obj.lunch_end_time = datetime.datetime.now().time()
             obj.save()
             return HttpResponseRedirect(obj.get_absolute_url())
+        
+        if "_generate_daily_digest_pdf" in request.POST.keys():
+            obj = self.get_object()
+            obj.save()
+
+            context = {
+                "object": obj,
+                "daily_digest": obj.digest,
+                "user": obj.user,
+            }
+
+            html_string = render_to_string("days/resumen_diario.html", context=context)
+            pdf = pdfkit.from_string(html_string, False)
+
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="Resumen diario {obj.day}-{obj.month.month}-{obj.month.year.year}.pdf"'
+
+            return response 
 
         return super().post(request, **kwargs)
 

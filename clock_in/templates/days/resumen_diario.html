@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+    </head>
+
+    <body>
+        <h1>INFORME DIARIO DE CUMPLIMIENTO DE FUNCIONES Y TAREAS ENCOMENDADAS</h1>
+        <p><b>Nombre:</b> {{user.first_name}}</p>
+        <p><b>Apellidos:</b> {{user.last_name}}</p>
+        <p><b>Puesto de trabajo:</b> {{user.job_position}}</p>
+        <p><b>Tareas encomendadadas de forma presencial:</b></p>
+        <p>{{user.job_tasks|linebreaks}}</p>
+
+        <h1>LISTADO DE TAREAS REALIZADAS DESDE MI DOMICILIO EL DÍA 18 DE MARZO DE 2020 Y RUTA DE ACCESO O MEDIO DESIGNADO A EFECTOS DE COMPROBACIÓN:</h1>
+        <p>
+            {{daily_digest|linebreaks}}
+        </p>
+        <p>Y para que así conste remito el presente informe mediante correo electrónico para debido cumplimiento.</p>
+
+        <p>
+            <b>
+                VICERRECTOR/A DE ESTUDIANTES<br>
+                DIRECTORA DEL ÁREA ACADÉMICA<br>
+                JEFE DEL SERVICIO O UNIDAD DE GESTIÓN ACADÉMICA Y ALUMNOS
+            </b>
+        </p>
+
+    </body>
+</html>

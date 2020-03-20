@@ -24,3 +24,7 @@ django-extensions==2.2.8
 
 # Django tempus dominus
 django-tempus-dominus==5.1.2.13
+
+# wkhtmltopdf
+django-wkhtmltopdf==3.3.0
+pdfkit==0.6.1

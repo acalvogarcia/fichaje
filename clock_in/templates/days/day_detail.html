@@ -8,6 +8,7 @@
 </head>
 
 <body>
+  {{user.last_name}}
   <h1>User: {{ object.month.year.user }}</h1>
   <h1>{{ object.day }} - {{ object.month.month}} - {{ object.month.year.year }}</h1>
 
@@ -25,18 +26,22 @@
 
       <input type="submit" class="btn btn-primary" value="Fichar entrada" form="fichar_entrada" />
       <input type="submit" class="btn btn-primary" value="Fichar salida" form="fichar_salida" />
+      <input type="submit" class="btn btn-primary" value="Generar PDF de resumen diario" form="descargar_pdf" />
     </div>
     &nbsp;
     <div class="col-sm-12">
       <form action="" method="post"> {% csrf_token %}
         {{form.as_p}}
-        <input type="submit" />
+        <input type="submit" class="btn btn-primary" value="Guardar"/>
       </form>
       <form id="fichar_entrada" action="" method="post"> {% csrf_token %}
         <input type="hidden" name="_fichar_entrada"></p>
       </form>
       <form id="fichar_salida" action="" method="post"> {% csrf_token %}
         <input type="hidden" name="_fichar_salida"></p>
+      </form>
+      <form id="descargar_pdf" action="" method="post"> {% csrf_token %}
+        <input type="hidden" name="_generate_daily_digest_pdf">
       </form>
     </div>
 
