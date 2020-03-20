@@ -68,7 +68,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
 
 # STATIC
 # ------------------------
-# STATICFILES_STORAGE = 'clock_in.storage.WhiteNoiseStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.WhiteNoiseStaticFilesStorage'
 # MEDIA
 # ------------------------------------------------------------------------------
 
