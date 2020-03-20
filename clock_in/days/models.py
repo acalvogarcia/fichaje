@@ -22,6 +22,40 @@ class Year(models.Model):
 
     unique_together = ['year', 'user']
 
+    @property
+    def time_worked(self) -> datetime.timedelta:
+        time_worked = datetime.timedelta(0)
+        for month in self.months.all():
+            time_worked += month.time_worked
+        return time_worked
+
+    @property
+    def days_worked(self) -> int:
+        days_worked = 0
+        for month in self.months.all():
+            days_worked += month.worked_days.count()
+        return days_worked
+
+    @property
+    def working_time_delta(self) -> datetime.timedelta:
+        day_working_time = self.user.day_working_time
+        day_working_time_delta = datetime.timedelta(
+            hours=day_working_time.hour,
+            minutes=day_working_time.minute,
+            seconds=day_working_time.second)
+        return self.days_worked * day_working_time_delta
+
+    @property
+    def time_balance(self) -> datetime.timedelta:
+        time_balance = datetime.timedelta(0)
+        for month in self.months.all():
+            time_balance += month.time_balance
+        return time_balance
+
+    @property
+    def time_balance_positive(self) -> bool:
+        return self.time_balance >= datetime.timedelta(0)
+
     def get_absolute_url(self):
         return reverse("days:year", kwargs={"year": self.year})
 
@@ -40,7 +74,10 @@ class Month(models.Model):
     def time_worked(self) -> datetime.timedelta:
         time_worked = datetime.timedelta(0)
         for day in self.worked_days.all():
-            time_worked += day.time_worked
+            try:
+                time_worked += day.time_worked
+            except ValueError:
+                pass
         return time_worked
     
     @property
