@@ -46,25 +46,25 @@ class DayDetailView(LoginRequiredMixin, UpdateView):
         print(request.__dict__)
         if "_fichar_entrada" in request.POST.keys():
             obj = self.get_object()
-            obj.start_time = datetime.datetime.now().time()
+            obj.start_time = datetime.datetime.now().time().replace(microsecond=0)
             obj.save()
             return HttpResponseRedirect(obj.get_absolute_url())
 
         if "_fichar_salida" in request.POST.keys():
             obj = self.get_object()
-            obj.end_time = datetime.datetime.now().time()
+            obj.end_time = datetime.datetime.now().time().replace(microsecond=0)
             obj.save()
             return HttpResponseRedirect(obj.get_absolute_url())
 
         if "_fichar_inicio_comida" in request.POST.keys():
             obj = self.get_object()
-            obj.lunch_start_time = datetime.datetime.now().time()
+            obj.lunch_start_time = datetime.datetime.now().time().replace(microsecond=0)
             obj.save()
             return HttpResponseRedirect(obj.get_absolute_url())
 
         if "_fichar_final_comida" in request.POST.keys():
             obj = self.get_object()
-            obj.lunch_end_time = datetime.datetime.now().time()
+            obj.lunch_end_time = datetime.datetime.now().time().replace(microsecond=0)
             obj.save()
             return HttpResponseRedirect(obj.get_absolute_url())
         
@@ -129,30 +129,28 @@ class MonthDetailView(LoginRequiredMixin, ListView):
             try:
                 day_object = queryset.get(day=int(day))
                 days_worked[day]["day_object"] = day_object
-                days_worked[day]["day_link"] = day_object.get_absolute_url
-                days_worked[day]["time_worked"] = day_object.time_worked
-                days_worked[day]["day_working_time"] = day_object.working_time_delta
                 days_worked[day]["time_balance"] = abs(day_object.time_balance)
                 days_worked[day]["time_balance_positive"] = day_object.time_balance_positive
             except WorkDay.DoesNotExist:
                 days_worked[day]["day_link"] = WorkDay.get_day_url(day=day, month=month, year=year)
-                days_worked[day]["time_worked"] = "--"
-                days_worked[day]["day_working_time"] = "--"
-                days_worked[day]["time_balance"] = "--"
-                days_worked[day]["time_balance_positive"] = True
 
         month_object = self.get_object()
 
         context["year_link"] = month_object.year.get_absolute_url()
-        context["month_link"] = month_object.get_absolute_url()
-
-        total_time_worked = datetime.timedelta()
-        for time_worked in [day.time_worked for day in self.get_queryset()]:
-            total_time_worked += time_worked
 
         context["days_worked"] = days_worked
         context["days_in_month"] = days_in_month
-        context["total_time_worked"] = total_time_worked
+
+        context["month"] = month_object
+
+        context["total_time_worked"] = month_object.time_worked
+        context["time_balance"] = abs(month_object.time_balance)
+        context["month_working_time"] = month_object.working_time_delta
+        context["time_balance_positive"] = month_object.time_balance_positive
+
+        from pprint import pprint
+        print("CONTEXT")
+        pprint(context)
 
         return context
 
@@ -190,18 +188,11 @@ class YearDetailView(LoginRequiredMixin, ListView):
             try:
                 month_object = queryset.get(month=int(month))
                 months_worked[month]["month_object"] = month_object
-                months_worked[month]["month_link"] = month_object.get_absolute_url
-                months_worked[month]["time_worked"] = month_object.time_worked
-                months_worked[month]["month_working_time"] = month_object.working_time_delta
                 months_worked[month]["time_balance"] = abs(month_object.time_balance)
                 months_worked[month]["time_balance_positive"] = month_object.time_balance_positive
             except Month.DoesNotExist:
                 months_worked[month] = {}
                 months_worked[month]["month_link"] = Month.get_month_url(month=month, year=year)
-                months_worked[month]["time_worked"] = "--"
-                months_worked[month]["month_working_time"] = "--"
-                months_worked[month]["time_balance"] = "--"
-                months_worked[month]["time_balance_positive"] = True
         
         year_object = self.get_object()
 
@@ -211,5 +202,12 @@ class YearDetailView(LoginRequiredMixin, ListView):
 
         context["months_worked"] = months_worked
         context["year_link"] = year_object.get_absolute_url()
+
+        context["year"] = year_object
+
+        context["total_time_worked"] = year_object.time_worked
+        context["time_balance"] = abs(year_object.time_balance)
+        context["year_working_time"] = year_object.working_time_delta
+        context["time_balance_positive"] = year_object.time_balance_positive
 
         return context
