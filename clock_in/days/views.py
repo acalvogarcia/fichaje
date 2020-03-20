@@ -77,12 +77,13 @@ class DayDetailView(LoginRequiredMixin, UpdateView):
                 "daily_digest": obj.digest,
                 "user": obj.user,
             }
+            from xhtml2pdf import pisa
 
-            html_string = render_to_string("days/resumen_diario.html", context=context)
-            pdf = pdfkit.from_string(html_string, False)
-
-            response = HttpResponse(pdf, content_type='application/pdf')
+            response = HttpResponse(content_type='application/pdf')
             response['Content-Disposition'] = f'attachment; filename="Resumen diario {obj.day}-{obj.month.month}-{obj.month.year.year}.pdf"'
+            html_string = render_to_string("days/resumen_diario.html", context=context)
+            pisa_status = pisa.CreatePDF(
+                html_string, dest=response)
 
             return response 
 

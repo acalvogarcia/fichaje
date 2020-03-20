@@ -13,23 +13,6 @@ RUN apt-get update \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
-  # && apt update \
-  # && apt-get install -y wget \
-  # && wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb\
-  # && apt-get install xvfb libfontconfig wkhtmltopdf
-  # && apt-get install wget \
-  # && wget https://builds.wkhtmltopdf.org/0.12.1.3/wkhtmltox_0.12.1.3-1~bionic_amd64.deb \
-  # && dpkg -i wkhtmltox_0.12.5-1.buster_amd64.deb \
-  # && apt-get install -f \
-  # && ln -s /usr/local/bin/wkhtmltopdf /usr/bin \
-  # && ln -s /usr/local/bin/wkhtmltoimage /usr/bin
-
-RUN curl -L#o wk.tar.xz https://downloads.wkhtmltopdf.org/0.12/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz \
-    && tar xf wk.tar.xz \
-    && cp wkhtmltox/bin/wkhtmltopdf /usr/bin \
-    && cp wkhtmltox/bin/wkhtmltoimage /usr/bin \
-    && rm wk.tar.xz
-    # && rm -r wkhtmlto
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
