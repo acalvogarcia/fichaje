@@ -42,7 +42,7 @@
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand" href="{% url 'days:day' current_year current_month current_day %}">Fichaje</a>
+        <a class="navbar-brand" href="{% url 'days:day-today' %}">Fichaje</a>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
@@ -52,7 +52,7 @@
                 <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">Mi perfil</a>
               </li>
               <li>
-                <a class="nav-link" href="{% url 'days:day' current_year current_month current_day %}">Hoy</a>
+                <a class="nav-link" href="{% url 'days:day-today' %}">Hoy</a>
               </li>
               <li class="nav-item">
                 {# URL provided by django-allauth/account/urls.py #}

@@ -22,9 +22,14 @@ class DayDetailView(LoginRequiredMixin, UpdateView):
     template_name = "days/day_detail.html"
 
     def get_object(self, **kwargs) -> WorkDay:
-        day = self.kwargs["day"]
-        month = self.kwargs["month"]
-        year = self.kwargs["year"]
+        day = self.kwargs.get("day")
+        month = self.kwargs.get("month")
+        year = self.kwargs.get("year")
+        if not all([day, month, year]):
+            day = datetime.datetime.now().day
+            month = datetime.datetime.now().month
+            year = datetime.datetime.now().year
+
         user = self.request.user
 
         try:
@@ -67,7 +72,7 @@ class DayDetailView(LoginRequiredMixin, UpdateView):
             obj.lunch_end_time = datetime.datetime.now().time().replace(microsecond=0)
             obj.save()
             return HttpResponseRedirect(obj.get_absolute_url())
-        
+
         if "_generate_daily_digest_pdf" in request.POST.keys():
             obj = self.get_object()
             obj.save()
@@ -84,7 +89,7 @@ class DayDetailView(LoginRequiredMixin, UpdateView):
             pisa_status = pisa.CreatePDF(
                 html_string, dest=response)
 
-            return response 
+            return response
 
         return super().post(request, **kwargs)
 
@@ -172,7 +177,7 @@ class YearDetailView(LoginRequiredMixin, ListView):
 
         year_object = Year.objects.get(user=user, year=year)
         return year_object.months.all()
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         queryset = self.get_queryset()
@@ -180,7 +185,7 @@ class YearDetailView(LoginRequiredMixin, ListView):
         year = self.kwargs["year"]
         user = self.request.user
 
-        months_in_year = [str(num) for num in range(1,13)]
+        months_in_year = [str(num) for num in range(1, 13)]
 
         months_worked = {}
         for month in months_in_year:
@@ -193,7 +198,7 @@ class YearDetailView(LoginRequiredMixin, ListView):
             except Month.DoesNotExist:
                 months_worked[month] = {}
                 months_worked[month]["month_link"] = Month.get_month_url(month=month, year=year)
-        
+
         year_object = self.get_object()
 
         total_time_worked = datetime.timedelta()
