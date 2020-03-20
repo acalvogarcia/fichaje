@@ -1,69 +1,62 @@
-<html>
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
 
-<head>
-    <title>{{ object.day }} - {{ object.month.month }} - {{ object.month.year.year }}</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-</head>
+{% block title %}{{ user.username }}{% endblock %}
 
-<body>
-    <h1>User: {{ user }}</h1>
-    <h1>{{ object.day }} - {{ object.month.month}} - {{ object.month.year.year }}</h1>
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">Año</li>
+    </ol>
+</nav>
 
-    <div class="row">
+<h1>{{ year.year }}</h1>
 
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item active" aria-current="page">Año</li>
-            </ol>
-          </nav>
+<div class="col-sm-12">
+    <p>Total horas trabajadas: {{total_time_worked}}</p>
+    <p>Total horas de jornada: {{year_working_time}}</p>
+    <p>Balance de horas: 
+        {% if time_balance_positive %}
+        <font style="color:green">{{time_balance}}</font>
+        {% else %}
+        <font style="color:red">-{{time_balance}}</font>
+        {% endif %}
+    </p>
 
-        <div class="col-sm-12">
-            Tiempo trabajado total: {{total_time_worked}}
-            
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Día</th>
-                        <th scope="col">Horas trabajadas</th>
-                        <th scope="col">Horas jornada</th>
-                        <th scope="col">Balance de horas</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for month, dict in months_worked.items %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Día</th>
+                <th scope="col">Horas trabajadas</th>
+                <th scope="col">Horas jornada</th>
+                <th scope="col">Balance de horas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for month, dict in months_worked.items %}
 
-                    <tr>
-                        <th scope="row"><a href="{{dict.month_link}}">{{month}}</a></th>
-                        <td>{{dict.time_worked}}</td>
-                        <td>{{dict.month_working_time}}</td>
-                        {% if dict.time_balance_positive %}
-                        <td style="color:green">{{dict.time_balance}}</td>
-                        {% else %}
-                        <td style="color:red">-{{dict.time_balance}}</td>
-                        {% endif %}
-                    </tr>
+            <tr>
+                {% if "month_object" in dict.keys %}
+                <th scope="row"><a href="{{dict.month_object.get_absolute_url}}">{{month}}</a></th>
+                <td>{{dict.month_object.time_worked}}</td>
+                <td>{{dict.month_object.working_time_delta}}</td>
+                {% if dict.time_balance_positive %}
+                <td style="color:green">{{dict.time_balance}}</td>
+                {% else %}
+                <td style="color:red">-{{dict.time_balance}}</td>
+                {% endif %}
+                {% else %}
+                <th scope="row"><a href="{{dict.month_link}}">{{month}}</a></th>
+                <td>--</td>
+                <td>--</td>
+                <td>--</td>
+                {% endif %}
+            </tr>
 
-                    {% endfor %}
+            {% endfor %}
 
-            </table>
+    </table>
 
-        </div>
+</div>
 
-
-    </div>
-
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-        crossorigin="anonymous"></script>
-
-</body>
-
-
-</html>
+{% endblock %}
