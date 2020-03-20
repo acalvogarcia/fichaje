@@ -100,7 +100,7 @@ class MonthDetailView(LoginRequiredMixin, ListView):
         user = self.request.user
 
         try:
-            return Month.objects.get(month=month, year__year=year)
+            return Month.objects.get(month=month, year__year=year, year__user=user)
         except Month.DoesNotExist:
             try:
                 year_object = Year.objects.get(user=user, year=year)
