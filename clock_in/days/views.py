@@ -1,6 +1,6 @@
 import datetime
-import pdfkit
 from calendar import monthrange
+from xhtml2pdf import pisa
 
 from django.db.models import QuerySet
 from django.shortcuts import render
@@ -77,7 +77,6 @@ class DayDetailView(LoginRequiredMixin, UpdateView):
                 "daily_digest": obj.digest,
                 "user": obj.user,
             }
-            from xhtml2pdf import pisa
 
             response = HttpResponse(content_type='application/pdf')
             response['Content-Disposition'] = f'attachment; filename="Resumen diario {obj.day}-{obj.month.month}-{obj.month.year.year}.pdf"'
