@@ -77,10 +77,18 @@ class DayDetailView(LoginRequiredMixin, UpdateView):
             obj = self.get_object()
             obj.save()
 
+            from django.utils.translation import activate
+            from django.template.defaultfilters import date
+
+            activate("es")
+
             context = {
                 "object": obj,
                 "daily_digest": obj.digest,
                 "user": obj.user,
+                "day": obj.day,
+                "month": date(datetime.date(day=obj.day, month=obj.month.month, year=obj.month.year.year), "F").upper(),
+                "year": obj.month.year.year,
             }
 
             response = HttpResponse(content_type='application/pdf')
