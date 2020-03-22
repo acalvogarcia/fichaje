@@ -308,3 +308,8 @@ REST_FRAMEWORK = {
 # Django Tempus Dominus
 TEMPUS_DOMINUS_LOCALIZE = False
 TEMPUS_DOMINUS_INCLUDE_ASSETS = True
+
+# django-extensions
+# ------------------------------------------------------------------------------
+# https://django-extensions.readthedocs.io/en/latest/installation_instructions.html#configuration
+INSTALLED_APPS += ["django_extensions"]  # noqa F405
