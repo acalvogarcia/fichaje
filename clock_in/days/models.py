@@ -154,6 +154,9 @@ class WorkDay(models.Model):
 
     @property
     def time_balance(self) -> datetime.timedelta:
+        if not self.start_time or not self.end_time:
+            return - self.working_time_delta
+
         courtesy_time = datetime.timedelta(0)
         user = self.user
         start_time_limit = datetime.time(hour=10) if user.time_flexibility else datetime.time(hour=9)
