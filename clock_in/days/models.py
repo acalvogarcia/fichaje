@@ -130,7 +130,7 @@ class WorkDay(models.Model):
     @property
     def time_worked(self) -> datetime.timedelta:
         if not self.start_time or not self.end_time:
-            raise ValueError("Both start_time and end_time must be set in order to calculate the worked time")
+            return datetime.timedelta(0)
         start_time = self.start_time
         end_time = self.end_time
 
